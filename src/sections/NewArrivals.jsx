@@ -1,42 +1,76 @@
 import { useContext } from "react";
-import { CartContext } from "../context/CartContext";
 import products from "../data/products";
+import { CartContext } from "../context/CartContext";
+import { WishlistContext } from "../context/WishlistContext";
 
 export default function NewArrivals() {
   const { addToCart } = useContext(CartContext);
+  const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
 
   return (
-    <div className="px-6 py-16">
+    <div className="px-6 py-20 bg-[#EADFD6]">
 
-      <h2 className="text-3xl font-bold text-center mb-10">
+      {/* Title */}
+      <h2 className="text-3xl md:text-5xl font-bold text-center mb-12">
         New Arrivals
       </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+      {/* Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
 
-        {products.map((p, index) => (
-          <div key={p.id || index} className="group border rounded-xl p-3">
+        {products.map((p) => (
+          <div
+            key={p.id}
+            className="group card overflow-hidden transition duration-300"
+          >
 
-            <img
-              src={p.image}
-              className="w-full h-56 sm:h-64 md:h-72 object-cover rounded-lg"
-            />
+            {/* Image */}
+            <div className="relative overflow-hidden rounded-t-[50px]">
+              <img
+                src={p.image}
+                className="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition duration-500"
+              />
 
-            <h3 className="mt-3 font-semibold">{p.name}</h3>
-            <p className="text-gray-500">{p.brand}</p>
-            <p className="font-bold">₹{p.price}</p>
+              {/* Heart Icon */}
+              <div
+                onClick={() => toggleWishlist(p)}
+                className="absolute top-3 right-3 text-xl cursor-pointer"
+              >
+                {isInWishlist(p.id) ? "❤️" : "🤍"}
+              </div>
 
-            <button
-              onClick={() => addToCart(p)}
-              className="hidden group-hover:block mt-2 bg-black text-white px-4 py-1 rounded"
-            >
-              Add to Cart
-            </button>
+              {/* Quick Add Button */}
+              <button
+                onClick={() => addToCart(p)}
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 
+                           bg-black text-white px-4 py-1 rounded-full text-sm
+                           opacity-0 group-hover:opacity-100 transition"
+              >
+                Quick Add
+              </button>
+            </div>
 
+            {/* Info */}
+            <div className="p-4">
+
+              <p className="text-sm text-gray-500">
+                {p.brand}
+              </p>
+
+              <h3 className="font-semibold">
+                {p.name}
+              </h3>
+
+              <p className="mt-1 font-bold">
+                ₹{p.price}
+              </p>
+
+            </div>
           </div>
         ))}
 
       </div>
+
     </div>
   );
 }

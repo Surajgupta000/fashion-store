@@ -161,6 +161,33 @@
   }
 }
 
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-primary);
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.25);
+}
+
+.text-primary {
+  color: var(--color-text-dark);
+}
+
+.text-secondary {
+  color: #6B7280;
+}
+
+.bg-luxury {
+  background: linear-gradient(135deg, #111111 0%, #0F0F0F 100%);
+}
+
 .ticks {
   position: relative;
   width: 100%;

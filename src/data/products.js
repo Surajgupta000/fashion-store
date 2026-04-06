@@ -4,44 +4,49 @@ const products = [
     name: "Red Saree",
     brand: "Zara",
     price: 1999,
-    image: "https://images.unsplash.com/photo-1581044777550-4cfa60707c03"
+    category: "Sarees",
+    image: new URL("../assets/Saree-collections.jpeg", import.meta.url).href
   },
   {
     id: 2,
     name: "Lehenga Set",
     brand: "Biba",
     price: 4999,
-    image: "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6"
+    category: "Lehengas",
+    image: new URL("../assets/Lehenga.jpeg", import.meta.url).href
   },
   {
     id: 3,
     name: "Designer Suit",
     brand: "W",
     price: 2999,
-    image: "https://images.unsplash.com/photo-1520975922284-9e0c6b4f4d5f"
+    category: "Suits",
+    image: new URL("../assets/suit2.jpg", import.meta.url).href
   },
   {
     id: 4,
-    name: "Designer Suit",
-    brand: "W",
-    price: 2999,
-    image: "https://images.unsplash.com/photo-1520975922284-9e0c6b4f4d5f"
+    name: "Anarkali Dress",
+    brand: "Zara",
+    price: 3499,
+    category: "Dresses",
+    image: new URL("../assets/Anarkali suit.jpg", import.meta.url).href
   },
   {
     id: 5,
-    name: "Designer Suit",
+    name: "Dupatta",
     brand: "W",
-    price: 2999,
-    image: "https://images.unsplash.com/photo-1520975922284-9e0c6b4f4d5f"
+    price: 999,
+    category: "Dupattas",
+    image: new URL("../assets/net dupata.jpg", import.meta.url).href
   },
   {
     id: 6,
-    name: "Designer Suit",
-    brand: "W",
-    price: 2999,
-    image: "https://images.unsplash.com/photo-1520975922284-9e0c6b4f4d5f"
-  },
-  
+    name: "Fabric Material",
+    brand: "Local",
+    price: 799,
+    category: "Fabrics",
+    image: new URL("../assets/Mixed fabrics.jpg", import.meta.url).href
+  }
 ];
 
 export default products;

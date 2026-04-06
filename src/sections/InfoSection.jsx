@@ -1,23 +1,11 @@
-import { useEffect, useState } from "react";
-
-const images = [
-  "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6",
-  "https://images.unsplash.com/photo-1581044777550-4cfa60707c03",
-  "https://images.unsplash.com/photo-1618354691373-d851c5c3a990"
-];
+import { useNavigate } from "react-router-dom";
+import anarkaliImage from "../assets/lehenga4.jpg";
 
 export default function InfoSection() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col md:flex-row items-center gap-10 px-6 py-16 max-w-7xl mx-auto">
+    <div className="flex flex-col md:flex-row items-center gap-10 px-6 py-16 max-w-7xl mx-auto bg-[var(--color-bg-light)] rounded-3xl">
 
       {/* LEFT TEXT */}
       <div className="flex-1">
@@ -26,20 +14,22 @@ export default function InfoSection() {
         </h2>
 
         <p className="text-gray-600 mb-6">
-          Discover handpicked collections designed for modern women.
-          From traditional sarees to trendy dresses — we bring fashion to life.
+          Discover handpicked collections crafted for modern women.
         </p>
 
-        <button className="bg-black text-white px-6 py-2 rounded-full">
-          Explore More
+        <button
+          onClick={() => navigate("/exclusive")}
+          className="btn-accent"
+        >
+          Catch it now →
         </button>
       </div>
 
       {/* RIGHT IMAGE */}
       <div className="flex-1">
         <img
-          src={images[index]}
-          className="rounded-2xl w-full h-56 sm:h-72 md:h-96 object-cover transition-all duration-700"
+          src={anarkaliImage}
+          className="rounded-2xl w-full h-[400px] object-cover"
         />
       </div>
 
