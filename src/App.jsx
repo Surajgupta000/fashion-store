@@ -14,8 +14,8 @@ import Exclusive from "./pages/Exclusive";
 function App() {
   return (
     <BrowserRouter>
-    <Navbar />
-    <CartDrawer />
+      <Navbar />
+      <CartDrawer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/categories" element={<Categories />} />

@@ -5,161 +5,139 @@ import products from "../data/products";
 export default function Gallery() {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // 🔥 Create categories dynamically from products
-  const categoryMap = {};
-
-  products.forEach((p) => {
-    if (!categoryMap[p.category]) {
-      categoryMap[p.category] = {
-        name: p.category,
-        image: p.image,
-        count: 0
-      };
+  // Group products by category for the gallery display
+  const categoryMap = products.reduce((acc, p) => {
+    if (!acc[p.category]) {
+      acc[p.category] = { name: p.category, image: p.image, count: 0 };
     }
-    categoryMap[p.category].count++;
-  });
+    acc[p.category].count++;
+    return acc;
+  }, {});
 
   const categories = Object.values(categoryMap);
 
-  // Check if mobile/tablet
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // 🎯 Navigation logic
-  const prev = () => {
-    setIndex((prev) =>
-      prev === 0 ? categories.length - 1 : prev - 1
-    );
-  };
-
-  const next = () => {
-    setIndex((prev) =>
-      prev === categories.length - 1 ? 0 : prev + 1
-    );
-  };
+  const next = () => setIndex((prev) => (prev + 1) % categories.length);
+  const prev = () => setIndex((prev) => (prev === 0 ? categories.length - 1 : prev - 1));
 
   const getItem = (offset) => {
-    return categories[
-      (index + offset + categories.length) % categories.length
-    ];
-  };
-
-  // Touch handling for mobile
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-
-  const handleTouchStart = (e) => {
-    setTouchEnd(0);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    if (isLeftSwipe) next();
-    if (isRightSwipe) prev();
+    const i = (index + offset + categories.length) % categories.length;
+    return categories[i];
   };
 
   return (
-    <div className="py-20 bg-[var(--color-bg-light)] text-center">
+    <div className="pt-10 pb-24 bg-[#FDFCFB] overflow-hidden">
+      {/* Editorial Header */}
+      <div className="text-center mb-16 space-y-4">
+        <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-arinya-gold">
+          Seasonal Lookbook
+        </span>
+        <h2 className="font-serif text-4xl md:text-6xl italic text-arinya-dark">
+          The Curated Collections
+        </h2>
+        <div className="w-12 h-[1px] bg-arinya-dark mx-auto mt-6"></div>
+      </div>
 
-      <h2 className="text-3xl md:text-5xl font-bold mb-12">
-        Exclusive Collections
-      </h2>
+      {/* Carousel Container */}
+      <div className="relative flex items-center justify-center h-[420px] md:h-[500px] gap-4">
+        
+        {/* Navigation - Minimalist floating arrows */}
+        <button 
+          onClick={prev}
+          className="absolute left-4 md:left-10 z-30 p-4 border border-arinya-dark/10 rounded-full hover:bg-arinya-dark hover:text-white transition-all duration-500 hidden md:block"
+        >
+          <span className="text-xl">←</span>
+        </button>
 
-      <div
-        className="flex items-center justify-center gap-2 md:gap-4"
-        onTouchStart={isMobile ? handleTouchStart : undefined}
-        onTouchMove={isMobile ? handleTouchMove : undefined}
-        onTouchEnd={isMobile ? handleTouchEnd : undefined}
-      >
+        {/* BACKGROUND CARD LEFT */}
+        <div className="hidden lg:block opacity-30 grayscale scale-75 transition-all duration-700">
+           <Card item={getItem(-2)} size="small" />
+        </div>
 
-        {/* LEFT ARROW - Hidden on mobile */}
-        {!isMobile && (
-          <button
-            onClick={prev}
-            className="text-2xl md:text-4xl p-3 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-500 shadow-lg hover:shadow-xl hover:scale-110 transform"
-          >
-            ←
-          </button>
-        )}
+        {/* SIDE CARD LEFT */}
+        <div className="hidden md:block opacity-60 grayscale scale-90 transition-all duration-700">
+          <Card item={getItem(-1)} size="medium" />
+        </div>
 
-        {/* LEFT BLUR CARD */}
-        <Card item={getItem(-2)} blur />
+        {/* MAIN FOCUS CARD */}
+        <div className="z-20 scale-110 shadow-2xl transition-all duration-700 ease-in-out">
+          <Card 
+            item={getItem(0)} 
+            size="large" 
+            isMain 
+            onClick={() => navigate(`/shop?category=${getItem(0).name}`)} 
+          />
+        </div>
 
-        {/* FOCUS CARDS */}
-        <Card item={getItem(-1)} focus navigate={navigate} />
-        <Card item={getItem(0)} focus main navigate={navigate} />
-        <Card item={getItem(1)} focus navigate={navigate} />
+        {/* SIDE CARD RIGHT */}
+        <div className="hidden md:block opacity-60 grayscale scale-90 transition-all duration-700">
+          <Card item={getItem(1)} size="medium" />
+        </div>
 
-        {/* RIGHT BLUR CARD */}
-        <Card item={getItem(2)} blur />
+        {/* BACKGROUND CARD RIGHT */}
+        <div className="hidden lg:block opacity-30 grayscale scale-75 transition-all duration-700">
+           <Card item={getItem(2)} size="small" />
+        </div>
 
-        {/* RIGHT ARROW - Hidden on mobile */}
-        {!isMobile && (
-          <button
-            onClick={next}
-            className="text-2xl md:text-4xl p-3 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-500 shadow-lg hover:shadow-xl hover:scale-110 transform"
-          >
-            →
-          </button>
-        )}
+        <button 
+          onClick={next}
+          className="absolute right-4 md:right-10 z-30 p-4 border border-arinya-dark/10 rounded-full hover:bg-arinya-dark hover:text-white transition-all duration-500 hidden md:block"
+        >
+          <span className="text-xl">→</span>
+        </button>
+      </div>
 
+      {/* Progress Dots */}
+      <div className="flex justify-center gap-4 mt-12">
+        {categories.map((_, i) => (
+          <div 
+            key={i} 
+            className={`h-[2px] transition-all duration-500 ${i === index ? "w-12 bg-arinya-gold" : "w-4 bg-gray-200"}`}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-/* 💎 Card Component */
-function Card({ item, main, focus, blur, navigate }) {
+function Card({ item, size, isMain, onClick }) {
+  const dims = {
+    small: "w-32 h-48",
+    medium: "w-56 h-80",
+    large: "w-72 h-[380px] md:w-[350px] md:h-[450px]"
+  };
+
   return (
-    <div
-      onClick={() =>
-        main && navigate(`/categories?type=${item.name}`)
-      }
-      className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500
-        ${main ? "w-64 h-80 md:w-80 md:h-96 scale-110 shadow-2xl" : ""}
-        ${focus ? "w-48 h-72 md:w-56 md:h-80 scale-105 shadow-lg" : ""}
-        ${blur ? "w-32 h-48 md:w-40 md:h-56 opacity-50 blur-sm" : ""}
-      `}
+    <div 
+      onClick={onClick}
+      className={`${dims[size]} relative overflow-hidden group cursor-pointer rounded-sm`}
     >
       <img
         src={item.image}
-        className="w-full h-full object-cover"
+        alt={item.name}
+        className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
       />
+      
+      {/* Gradient Overlay - Deeper for the main card */}
+      <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-500 ${isMain ? "opacity-100" : "opacity-40"}`} />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-4 text-white">
-
-        <h3 className={`font-semibold ${main ? "text-xl" : focus ? "text-lg" : "text-sm"}`}>
+      {/* Content Area */}
+      <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
+        <p className="font-sans text-[10px] uppercase tracking-[0.3em] mb-2 opacity-80">
+          {item.count} Masterpieces
+        </p>
+        <h3 className={`font-serif italic leading-tight ${isMain ? "text-3xl md:text-4xl" : "text-xl"}`}>
           {item.name}
         </h3>
-
-        <p className={`text-sm ${main ? "text-base" : "text-xs"}`}>
-          {item.count} items
-        </p>
-
-        {/* Luxury Button for Main */}
-        {main && (
-          <button className="mt-3 bg-white/90 backdrop-blur-sm text-black px-3 py-2 rounded-full font-medium hover:bg-white transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 transform text-sm">
-            Get inside
-          </button>
+        
+        {isMain && (
+          <div className="mt-6 overflow-hidden">
+            <button className="flex items-center gap-3 font-sans text-[10px] !text-white hover:!text-arinya-gold uppercase tracking-[0.3em] group/btn transition-colors duration-300">
+              <span className="border-b border-white group-hover/btn:border-arinya-gold pb-1 transition-colors duration-300">Explore Edition</span>
+              <span className="transform group-hover/btn:translate-x-2 transition-transform duration-300">→</span>
+            </button>
+          </div>
         )}
-
       </div>
     </div>
   );

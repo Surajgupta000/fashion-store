@@ -1,76 +1,66 @@
-import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import products from "../data/products";
-import { CartContext } from "../context/CartContext";
-import { WishlistContext } from "../context/WishlistContext";
+import ProductCard from "../components/ProductCard";
 
 export default function NewArrivals() {
-  const { addToCart } = useContext(CartContext);
-  const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
+  const navigate = useNavigate();
+
+  // Filter for products marked 'isNew' and limit to 8 for a clean UI
+  const latestArrivals = products
+    .filter((p) => p.isNew)
+    .slice(0, 8); 
 
   return (
-    <div className="px-6 py-20 bg-[#EADFD6]">
-
-      {/* Title */}
-      <h2 className="text-3xl md:text-5xl font-bold text-center mb-12">
-        New Arrivals
-      </h2>
-
-      {/* Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-
-        {products.map((p) => (
-          <div
-            key={p.id}
-            className="group card overflow-hidden transition duration-300"
-          >
-
-            {/* Image */}
-            <div className="relative overflow-hidden rounded-t-[50px]">
-              <img
-                src={p.image}
-                className="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition duration-500"
-              />
-
-              {/* Heart Icon */}
-              <div
-                onClick={() => toggleWishlist(p)}
-                className="absolute top-3 right-3 text-xl cursor-pointer"
-              >
-                {isInWishlist(p.id) ? "❤️" : "🤍"}
-              </div>
-
-              {/* Quick Add Button */}
-              <button
-                onClick={() => addToCart(p)}
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 
-                           bg-black text-white px-4 py-1 rounded-full text-sm
-                           opacity-0 group-hover:opacity-100 transition"
-              >
-                Quick Add
-              </button>
-            </div>
-
-            {/* Info */}
-            <div className="p-4">
-
-              <p className="text-sm text-gray-500">
-                {p.brand}
-              </p>
-
-              <h3 className="font-semibold">
-                {p.name}
-              </h3>
-
-              <p className="mt-1 font-bold">
-                ₹{p.price}
-              </p>
-
-            </div>
+    <section className="pt-6 py-24 bg-white px-6 md:px-10">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* --- SECTION HEADER --- */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="space-y-4">
+            <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-arinya-gold font-semibold">
+              Spring / Summer 2026
+            </span>
+            <h2 className="font-serif text-4xl md:text-6xl italic text-arinya-dark leading-tight">
+              New <br /> <span className="not-italic font-normal">Arrivals</span>
+            </h2>
           </div>
-        ))}
+          
+          <div className="flex flex-col items-start md:items-end gap-4">
+            <p className="font-sans text-xs text-arinya-gray max-w-xs md:text-right uppercase tracking-widest leading-relaxed">
+              Discover our latest artisanal creations, where heritage meets modern silhouette.
+            </p>
+            <button 
+              onClick={() => navigate("/shop")}
+              className="group flex items-center gap-3 font-sans text-[10px] uppercase tracking-[0.3em] text-arinya-dark border-b border-arinya-dark pb-1 hover:text-arinya-gold hover:border-arinya-gold transition-all duration-300"
+            >
+              View Full Collection
+              <span className="transform group-hover:translate-x-2 transition-transform duration-300">→</span>
+            </button>
+          </div>
+        </div>
+
+        {/* --- PRODUCT GRID (Limited to 8) --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+          {latestArrivals.map((product) => (
+            <div key={product.id} className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+
+        {/* --- FOOTER CTA (Only shows if there are more than 8 products) --- */}
+        {products.filter(p => p.isNew).length > 8 && (
+          <div className="mt-20 text-center">
+            <button 
+              onClick={() => navigate("/shop")}
+              className="px-12 py-4 bg-arinya-dark text-white text-[10px] uppercase tracking-[0.4em] hover:bg-arinya-gold transition-colors duration-500 shadow-xl"
+            >
+              Explore All New Drops
+            </button>
+          </div>
+        )}
 
       </div>
-
-    </div>
+    </section>
   );
 }

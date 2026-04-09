@@ -1,4 +1,25 @@
 @import "tailwindcss";
+
+@theme {
+  --color-arinya-red: #8C1C13;
+  --color-arinya-gold: #C19A6B;
+  --color-arinya-dark: #0F0F0F;
+  --color-arinya-gray: #6B7280;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shine: shine 1.5s ease-out infinite;
+  --animate-marquee: marquee 45s linear infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(300%) skewX(-12deg); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
 :root {
   --color-primary: #0F0F0F;
   --color-accent: #C19A6B;
@@ -28,15 +49,7 @@ a, button {
   filter: brightness(1.06);
 }
 
-@keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
 
-.animate-marquee {
-  display: inline-block;
-  animation: marquee 10s linear infinite;
-}
 
 
 /* 🎨 Colors */
@@ -76,17 +89,4 @@ html {
 .btn-accent:hover {
   opacity: 0.9;
   transform: scale(1.05);
-}
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  display: inline-flex;
-  animation: marquee 20s linear infinite;
 }
