@@ -35,10 +35,10 @@ export default function ProductCard({ product }) {
         {/* ❤️ WISHLIST ICON (Floating Luxury Style) */}
         <button
           onClick={toggleWishlist}
-          className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/60 backdrop-blur-md shadow-sm transition-all duration-300 hover:bg-white hover:scale-110 active:scale-95"
+          className="absolute top-4 right-4 z-20 p-3 md:p-2.5 rounded-full bg-white/60 backdrop-blur-md shadow-sm transition-all duration-300 hover:bg-white hover:scale-110 active:scale-95"
         >
           <Heart 
-            className={`w-4 h-4 transition-colors duration-300 ${
+            className={`w-5 h-5 md:w-4 md:h-4 transition-colors duration-300 ${
               isInWishlist ? "fill-arinya-red text-arinya-red" : "text-arinya-dark"
             }`} 
           />
