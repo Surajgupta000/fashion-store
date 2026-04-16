@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react"; // Luxury-style icons
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
@@ -15,18 +15,20 @@ export default function ProductCard({ product }) {
   const isInWishlist = wishlist.some((item) => item.id === product.id);
 
   const toggleWishlist = (e) => {
+    e.preventDefault();
     e.stopPropagation(); // Prevents clicking the heart from opening the product page
     toggleContextWishlist(product);
   };
 
   const handleAddToCart = (e) => {
+    e.preventDefault();
     e.stopPropagation(); // Prevents clicking the button from opening the product page
     addToCart(product);
   };
 
   return (
-    <div 
-      onClick={() => navigate(`/product/${product.id}`)}
+    <Link 
+      to={`/product/${product.id}`}
       className="group cursor-pointer flex flex-col bg-white"
     >
       {/* IMAGE CONTAINER */}
@@ -57,6 +59,7 @@ export default function ProductCard({ product }) {
           src={product.image}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110"
+          onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"; }}
         />
         
         {/* Elegant Overlay on Hover */}
@@ -96,6 +99,6 @@ export default function ProductCard({ product }) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

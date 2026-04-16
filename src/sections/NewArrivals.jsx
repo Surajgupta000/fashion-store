@@ -1,9 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import products from "../data/products";
+import { useState, useEffect } from "react";
+import { fetchProducts } from "../services/api";
 import ProductCard from "../components/ProductCard";
 
 export default function NewArrivals() {
   const navigate = useNavigate();
+
+  const [products, setProducts] = useState([]);
+  
+  useEffect(() => {
+    fetchProducts().then(data => setProducts(data));
+  }, []);
 
   // Filter for products marked 'isNew' and limit to 8 for a clean UI
   const latestArrivals = products

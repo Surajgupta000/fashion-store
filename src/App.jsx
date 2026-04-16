@@ -11,6 +11,8 @@ import Navbar from "./components/Navbar";
 import CartDrawer from "./components/CartDrawer";
 import Checkout from "./pages/Checkout";
 import Exclusive from "./pages/Exclusive";
+import ProductDetails from "./pages/ProductDetails";
+import AdminGatekeeper from "./pages/AdminGatekeeper";
 
 // 💡 Helper to reset scroll position on page change (Essential for Mobile)
 function ScrollToTop() {
@@ -46,6 +48,8 @@ function App() {
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/exclusive" element={<Exclusive />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/admin-dashboard" element={<AdminGatekeeper />} />
           </Routes>
         </main>
 

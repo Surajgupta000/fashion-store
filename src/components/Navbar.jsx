@@ -67,7 +67,7 @@ export default function Navbar() {
               <Search className="w-5 h-5 text-[#0F0F0F]" />
             </button>
             {showSearch && (
-              <div className="absolute right-0 top-full mt-4 w-[85vw] sm:w-80 bg-white border border-gray-100 shadow-2xl p-5 rounded-sm">
+              <div className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 mt-2 sm:mt-4 w-auto sm:w-80 bg-white border border-gray-100 shadow-2xl p-5 rounded-sm z-[150]">
                 <input
                   type="text"
                   placeholder="Search..."

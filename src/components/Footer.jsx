@@ -1,8 +1,12 @@
 import { FiInstagram, FiPhone, FiMapPin, FiCreditCard, FiHeart } from 'react-icons/fi';
+import { useLocation } from 'react-router-dom';
 
 export default function Footer() {
+  const location = useLocation();
+  const isCheckout = location.pathname === '/checkout';
+
   return (
-    <footer className="bg-[#0F0F0F] text-[#EADFD6] px-6 py-16 mt-10 font-light">
+    <footer className={`bg-[#0F0F0F] text-[#EADFD6] px-6 pt-16 mt-10 font-light ${isCheckout ? 'pb-32 lg:pb-16' : 'pb-16'}`}>
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
 
         {/* Column 1: Brand Essence */}

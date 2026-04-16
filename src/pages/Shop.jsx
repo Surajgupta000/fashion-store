@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import products from "../data/products";
+import { useEffect } from "react";
+import { fetchProducts } from "../services/api";
 import ProductCard from "../components/ProductCard";
 
 const CATEGORIES = [
@@ -9,6 +10,18 @@ const CATEGORIES = [
 export default function Shop() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [sort, setSort] = useState("");
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      const data = await fetchProducts();
+      setProducts(data);
+      setLoading(false);
+    };
+    loadProducts();
+  }, []);
 
   // Filter and Sort logic
   const filteredProducts = useMemo(() => {
