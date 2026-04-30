@@ -1,10 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import products from "../data/products";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
+import { fetchProducts } from "../services/api";
 import { ArrowLeft } from "lucide-react";
 
 const CATEGORY_LIST = [
   { name: "Silk Saree", label: "Timeless Silk" },
+  { name: "Fancy Saree", label: "Artisan Luxe" },
   { name: "Lehenga", label: "Bridal Heritage" },
   { name: "Gown", label: "Contemporary Grace" },
   { name: "Suit", label: "The Ethnic Edit" },
@@ -15,6 +17,22 @@ export default function Categories() {
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search);
   const type = query.get("type");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await fetchProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to load category products", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
 
   const filteredProducts = type
     ? products.filter((p) => p.category === type)

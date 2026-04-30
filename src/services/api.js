@@ -7,7 +7,7 @@ export const fetchProducts = async () => {
         // Normalize DB products to match frontend expectations (id, isNew)
         const dbProducts = response.data.map(p => ({
             ...p,
-            id: p._id,
+            id: p._id || p.id,
             isNew: p.isArrival || false,
             // Fallback image in case the database contains a broken or empty one
             image: p.image || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"

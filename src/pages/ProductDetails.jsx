@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
-import products from "../data/products";
+import { fetchProducts } from "../services/api";
 import { Heart, ShoppingBag, ShieldCheck, Truck, ArrowLeft, Star } from "lucide-react";
 
 export default function ProductDetails() {
@@ -11,17 +11,39 @@ export default function ProductDetails() {
   const { addToCart, setIsOpen } = useContext(CartContext);
   const { wishlist, toggleWishlist } = useContext(WishlistContext);
 
-  // Find the specific product
-  const product = products.find((p) => p.id === parseInt(id));
-
-  // State for quantity and selection
+  const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(true);
   const isWishlisted = wishlist.some((item) => item.id === product?.id);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const allProducts = await fetchProducts();
+        const foundProduct = allProducts.find((p) => p.id?.toString() === id);
+        setProduct(foundProduct || null);
+      } catch (error) {
+        console.error("Failed to load product details", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id]);
 
   // Scroll to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center space-y-4">
+        <p className="font-serif italic text-2xl text-arinya-gray">Loading product details...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (

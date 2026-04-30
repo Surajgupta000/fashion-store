@@ -15,6 +15,22 @@ export default function AdminDashboard() {
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
+  const normalizeImageUrl = (value) => {
+    if (!value) return "";
+    const trimmed = value.toString().trim();
+    return /^(https?:\/\/)/i.test(trimmed) ? trimmed : "";
+  };
+
+  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  const CLOUDINARY_API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
+  const CLOUDINARY_ENABLED = Boolean(
+    CLOUDINARY_CLOUD_NAME &&
+    CLOUDINARY_CLOUD_NAME !== "your_cloud_name" &&
+    CLOUDINARY_UPLOAD_PRESET &&
+    CLOUDINARY_UPLOAD_PRESET !== "your_unsigned_preset"
+  );
+
   useEffect(() => {
     loadProducts();
   }, []);
@@ -30,8 +46,21 @@ export default function AdminDashboard() {
 
   // --- FEATURE 1: CLOUDINARY IMAGE UPLOAD ---
   const handleImageUpload = (isEdit = false) => {
+    if (!window.cloudinary) {
+      setStatus("Cloudinary widget not loaded. Check index.html and network access.");
+      return;
+    }
+    if (!CLOUDINARY_ENABLED) {
+      setStatus("Cloudinary is not configured. Set valid VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in fashion-store/.env and restart the dev server.");
+      return;
+    }
+
     window.cloudinary.openUploadWidget(
-      { cloudName: 'your_cloud_name', uploadPreset: 'your_preset' },
+      {
+        cloudName: CLOUDINARY_CLOUD_NAME,
+        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+        ...(CLOUDINARY_API_KEY ? { apiKey: CLOUDINARY_API_KEY } : {})
+      },
       (error, result) => {
         if (!error && result && result.event === "success") {
           if (isEdit) {
@@ -52,8 +81,15 @@ export default function AdminDashboard() {
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
-          setBulkProducts(results.data);
-          setStatus(`${results.data.length} items staged for bulk upload`);
+          const normalizedData = results.data.map((item) => {
+            const rawImage = item.image || item["Image URL"] || item["image url"] || item.img || item.Img || "";
+            return {
+              ...item,
+              image: normalizeImageUrl(rawImage)
+            };
+          });
+          setBulkProducts(normalizedData);
+          setStatus(`${normalizedData.length} items staged for bulk upload`);
         },
       });
     }
@@ -62,10 +98,10 @@ export default function AdminDashboard() {
   const submitSingle = async (e) => {
     e.preventDefault();
     try {
-      const productPayload = { ...product };
-      if (!productPayload.image) {
-        productPayload.image = "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"; 
-      }
+      const productPayload = {
+        ...product,
+        image: normalizeImageUrl(product.image) || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"
+      };
       await addProduct(productPayload);
       setStatus("Masterpiece added to Atelier!");
       setProduct({ name: "", price: "", originalPrice: "", category: "Fancy Saree", image: "", description: "" });
@@ -78,10 +114,13 @@ export default function AdminDashboard() {
 
   const submitBulk = async () => {
     try {
-      const payload = bulkProducts.map(p => ({
-        ...p,
-        image: p.image || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"
-      }));
+      const payload = bulkProducts.map(p => {
+        const rawImage = p.image || p["Image URL"] || p["image url"] || p.img || p.Img || "";
+        return {
+          ...p,
+          image: normalizeImageUrl(rawImage) || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"
+        };
+      });
       await addBulkProducts(payload);
       setStatus(`Successfully launched ${bulkProducts.length} products!`);
       setBulkProducts([]);
@@ -174,8 +213,8 @@ export default function AdminDashboard() {
                   onClick={() => handleImageUpload(false)}
                   className="group border-2 border-dashed border-gray-100 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-arinya-gold transition-all bg-[#FAF9F6]"
                 >
-                  {product.image ? (
-                    <img src={product.image} className="h-32 rounded-sm shadow-md" alt="Preview" />
+                  {normalizeImageUrl(product.image) ? (
+                    <img src={normalizeImageUrl(product.image)} className="h-32 rounded-sm shadow-md" alt="Preview" />
                   ) : (
                     <>
                       <Upload className="w-8 h-8 text-gray-300 group-hover:text-arinya-gold transition-colors mb-2" />
@@ -185,7 +224,7 @@ export default function AdminDashboard() {
                 </div>
                 {/* Image Link Input */}
                 <div className="pt-2">
-                  <p className="text-[10px] uppercase tracking-widest text-arinya-gray mb-1">Or Provide Image Link</p>
+                  <p className="text-[10px] uppercase tracking-widest text-arinya-gray mb-1">Or provide a remote image URL (https://)</p>
                   <input 
                     type="url" placeholder="https://example.com/image.jpg" value={product.image}
                     className="w-full border-b border-gray-100 py-3 outline-none focus:border-arinya-gold text-sm font-sans"
@@ -253,12 +292,13 @@ export default function AdminDashboard() {
                 {allProducts.map(p => {
                   const isEditing = editingId === p.id;
                   const canEdit = typeof p.id === "string";
+                  const rowImage = normalizeImageUrl(isEditing ? editFormData.image : p.image) || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop";
 
                   return (
                     <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-4">
-                          <img src={isEditing ? editFormData.image : p.image} alt={p.name} className="w-12 h-16 object-cover rounded-sm shadow-sm cursor-pointer" onClick={() => { if(isEditing) handleImageUpload(true) }} />
+                          <img src={rowImage} alt={p.name} className="w-12 h-16 object-cover rounded-sm shadow-sm cursor-pointer" onClick={() => { if(isEditing) handleImageUpload(true) }} />
                           {isEditing ? (
                             <div className="flex flex-col gap-2 w-full">
                               <input type="text" value={editFormData.name} onChange={(e) => setEditFormData({...editFormData, name: e.target.value})} className="border-b border-gray-200 outline-none text-sm w-full bg-transparent" placeholder="Name" />

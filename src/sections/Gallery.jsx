@@ -1,10 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import products from "../data/products";
 
 export default function Gallery() {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (event) => {
+    touchEndX.current = null;
+    touchStartX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchMove = (event) => {
+    touchEndX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const distance = touchStartX.current - touchEndX.current;
+    if (Math.abs(distance) < minSwipeDistance) return;
+    if (distance > 0) {
+      next();
+    } else {
+      prev();
+    }
+  };
 
   // Group products by category
   const categoryMap = products.reduce((acc, p) => {
@@ -39,7 +62,13 @@ export default function Gallery() {
       </div>
 
       {/* Carousel Container */}
-      <div className="relative flex items-center justify-center h-[400px] sm:h-[450px] md:h-[550px] w-full max-w-[1400px] mx-auto px-4">
+      <div
+        className="relative flex items-center justify-center h-[400px] sm:h-[450px] md:h-[550px] w-full max-w-[1400px] mx-auto px-4"
+        style={{ touchAction: "pan-y" }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         
         {/* Navigation Arrows - Desktop Only */}
         <button 
