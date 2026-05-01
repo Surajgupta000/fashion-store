@@ -6,8 +6,8 @@ export default function AdminGatekeeper() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
 
-  // In a real app, this would check against an Environment Variable
-  const ATELIER_KEY = "Arinya123";
+  // Use environment variable for security, with a fallback just in case
+  const ATELIER_KEY = import.meta.env.VITE_ADMIN_PASSWORD || "Arinya123";
 
   const handleLogin = (e) => {
     e.preventDefault();

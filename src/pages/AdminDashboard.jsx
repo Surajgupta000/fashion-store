@@ -17,7 +17,17 @@ export default function AdminDashboard() {
 
   const normalizeImageUrl = (value) => {
     if (!value) return "";
-    const trimmed = value.toString().trim();
+    let trimmed = value.toString().trim();
+    
+    // Handle protocol-relative URLs
+    if (trimmed.startsWith('//')) {
+      trimmed = 'https:' + trimmed;
+    } 
+    // Handle URLs missing http/https but starting with a domain
+    else if (!/^(https?:\/\/)/i.test(trimmed) && /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(trimmed)) {
+      trimmed = 'https://' + trimmed;
+    }
+
     return /^(https?:\/\/)/i.test(trimmed) ? trimmed : "";
   };
 
@@ -81,15 +91,29 @@ export default function AdminDashboard() {
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
-          const normalizedData = results.data.map((item) => {
-            const rawImage = item.image || item["Image URL"] || item["image url"] || item.img || item.Img || "";
+          const mappedData = results.data.map((item) => {
+            const rawImage = item.image || item.Image || item["Image URL"] || item["image url"] || item.img || item.Img || "";
+            const rawName = item.name || item.Name || item.Title || item.title || "";
+            const rawPrice = item.price || item.Price || item.Offer || item.offer || "";
+            const rawOriginalPrice = item.originalPrice || item["Original Price"] || item.MRP || item.mrp || "";
+            const rawCategory = item.category || item.Category || "Fancy Saree";
+            const rawDesc = item.description || item.Description || item.desc || "A testament to Arinya Shree craftsmanship.";
+
             return {
-              ...item,
+              name: rawName,
+              price: Number(rawPrice) || 0,
+              originalPrice: Number(rawOriginalPrice) || 0,
+              category: rawCategory,
+              description: rawDesc,
               image: normalizeImageUrl(rawImage)
             };
           });
-          setBulkProducts(normalizedData);
-          setStatus(`${normalizedData.length} items staged for bulk upload`);
+          
+          // Filter out rows that have absolutely no name and no price to prevent empty rows
+          const validData = mappedData.filter(d => d.name || d.price > 0);
+          
+          setBulkProducts(validData);
+          setStatus(`${validData.length} items staged for bulk upload`);
         },
       });
     }
@@ -113,12 +137,12 @@ export default function AdminDashboard() {
   };
 
   const submitBulk = async () => {
+    if (bulkProducts.length === 0) return;
     try {
       const payload = bulkProducts.map(p => {
-        const rawImage = p.image || p["Image URL"] || p["image url"] || p.img || p.Img || "";
         return {
           ...p,
-          image: normalizeImageUrl(rawImage) || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"
+          image: p.image || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"
         };
       });
       await addBulkProducts(payload);
@@ -214,7 +238,16 @@ export default function AdminDashboard() {
                   className="group border-2 border-dashed border-gray-100 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-arinya-gold transition-all bg-[#FAF9F6]"
                 >
                   {normalizeImageUrl(product.image) ? (
-                    <img src={normalizeImageUrl(product.image)} className="h-32 rounded-sm shadow-md" alt="Preview" />
+                    <img 
+                      src={normalizeImageUrl(product.image)} 
+                      className="h-32 rounded-sm shadow-md" 
+                      alt="Preview" 
+                      onError={(e) => { 
+                        e.target.onerror = null; 
+                        e.target.src = "https://placehold.co/400x400/eeeeee/999999?text=Image+Blocked+or+Invalid"; 
+                        setStatus("Warning: Image link is invalid or blocked by the source site (hotlinking).");
+                      }}
+                    />
                   ) : (
                     <>
                       <Upload className="w-8 h-8 text-gray-300 group-hover:text-arinya-gold transition-colors mb-2" />
@@ -298,7 +331,13 @@ export default function AdminDashboard() {
                     <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-4">
-                          <img src={rowImage} alt={p.name} className="w-12 h-16 object-cover rounded-sm shadow-sm cursor-pointer" onClick={() => { if(isEditing) handleImageUpload(true) }} />
+                          <img 
+                            src={rowImage} 
+                            alt={p.name} 
+                            className="w-12 h-16 object-cover rounded-sm shadow-sm cursor-pointer" 
+                            onClick={() => { if(isEditing) handleImageUpload(true) }} 
+                            onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"; }}
+                          />
                           {isEditing ? (
                             <div className="flex flex-col gap-2 w-full">
                               <input type="text" value={editFormData.name} onChange={(e) => setEditFormData({...editFormData, name: e.target.value})} className="border-b border-gray-200 outline-none text-sm w-full bg-transparent" placeholder="Name" />
