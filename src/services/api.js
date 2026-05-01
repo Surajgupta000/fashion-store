@@ -7,10 +7,11 @@ export const fetchProducts = async () => {
         // Normalize DB products to match frontend expectations (id, isNew)
         const dbProducts = response.data.map(p => ({
             ...p,
-            id: p._id || p.id,
+            id: p._id ? p._id.toString() : String(p.id),
             isNew: p.isArrival || false,
-            // Fallback image in case the database contains a broken or empty one
-            image: p.image || "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"
+            image: (p.image && !String(p.image).toUpperCase().startsWith('C:'))
+                ? p.image
+                : "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800"
         }));
         
         // Merge the backend database products with the locally stored static products

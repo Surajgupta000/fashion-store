@@ -26,10 +26,6 @@ export default function ProductCard({ product }) {
     addToCart(product);
   };
 
-  const productImage = /^https?:\/\//i.test(product.image)
-    ? product.image
-    : "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop";
-
   return (
     <Link 
       to={`/product/${product.id}`}
@@ -60,7 +56,7 @@ export default function ProductCard({ product }) {
         )}
 
         <img
-          src={productImage}
+          src={product.image}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110"
           onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1610030469983-98e550d615e1?q=80&w=800&auto=format&fit=crop"; }}

@@ -20,7 +20,7 @@ export default function ProductDetails() {
     const loadProduct = async () => {
       try {
         const allProducts = await fetchProducts();
-        const foundProduct = allProducts.find((p) => p.id?.toString() === id);
+        const foundProduct = allProducts.find((p) => String(p.id) === String(id));
         setProduct(foundProduct || null);
       } catch (error) {
         console.error("Failed to load product details", error);
